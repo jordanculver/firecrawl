@@ -3,6 +3,7 @@ import { JSDOM } from 'jsdom';
 import { SearchResult } from "../../src/lib/entities";
 import { logger } from "../../src/lib/logger";
 import https from 'https';
+import { AxiosProxyConfig } from "axios"
 
 const getRandomInt = (min: number, max: number): number => Math.floor(Math.random() * (max - min + 1)) + min;
 
@@ -20,7 +21,7 @@ async function _req(
   lang: string,
   country: string,
   start: number,
-  proxies: any,
+  proxy: any,
   timeout: number,
   tbs: string | undefined = undefined,
   filter: string | undefined = undefined,
@@ -47,10 +48,10 @@ async function _req(
           "Accept": "*/*"
       },
       params: params,
-      proxy: proxies,
+      proxy: proxy,
       timeout: timeout,
       httpsAgent: new https.Agent({
-        rejectUnauthorized: true 
+        rejectUnauthorized: false 
       }),
       withCredentials: true
     });
@@ -72,18 +73,18 @@ export async function googleSearch(
   filter = undefined as string | undefined,
   lang = "en",
   country = "us",
-  proxy = undefined as string | undefined,
+  proxy = undefined as AxiosProxyConfig | undefined,
   sleep_interval = 0,
   timeout = 5000,
 ): Promise<SearchResult[]> {
-  let proxies: any = null;
-  if (proxy) {
-    if (proxy.startsWith("https")) {
-      proxies = { https: proxy };
-    } else {
-      proxies = { http: proxy };
-    }
-  }
+  // let proxies: any = null;
+  // if (proxy) {
+  //   if (proxy.startsWith("https")) {
+  //     proxies = { https: proxy };
+  //   } else {
+  //     proxies = { http: proxy };
+  //   }
+  // }
 
   // TODO: knowledge graph, answer box, etc.
 
@@ -99,7 +100,7 @@ export async function googleSearch(
         lang,
         country,
         start,
-        proxies,
+        proxy,
         timeout,
         tbs,
         filter,

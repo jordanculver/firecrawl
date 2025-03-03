@@ -4,6 +4,7 @@ import { googleSearch } from "./googlesearch";
 import { searchapi_search } from "./searchapi";
 import { serper_search } from "./serper";
 import { searxng_search } from "./searxng";
+import { AxiosProxyConfig } from "axios";
 
 export async function search({
   query,
@@ -26,7 +27,7 @@ export async function search({
   lang?: string;
   country?: string;
   location?: string;
-  proxy?: string;
+  proxy?: AxiosProxyConfig;
   sleep_interval?: number;
   timeout?: number;
 }): Promise<SearchResult[]> {

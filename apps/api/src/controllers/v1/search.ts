@@ -19,6 +19,7 @@ import { search } from "../../search";
 import { isUrlBlocked } from "../../scraper/WebScraper/utils/blocklist";
 import * as Sentry from "@sentry/node";
 import { BLOCKLISTED_URL_MESSAGE } from "../../lib/strings";
+import { AxiosProxyConfig } from "axios";
 
 // Used for deep research
 export async function searchAndScrapeSearchResult(
@@ -139,7 +140,19 @@ export async function searchController(
     let limit = req.body.limit;
 
     // Buffer results by 50% to account for filtered URLs
+    let proxy = undefined as AxiosProxyConfig | undefined;
     const num_results_buffer = Math.floor(limit * 1.5);
+    if (process.env.PROXY_HOST && process.env.PROXY_PORT && process.env.PROXY_USERNAME && process.env.PROXY_PASSWORD) {
+      proxy = {
+        host: process.env.PROXY_HOST,
+        port: parseInt(process.env.PROXY_PORT),
+        auth: {
+          username: process.env.PROXY_USERNAME,
+          password: process.env.PROXY_PASSWORD,
+        },
+        protocol: "https",
+      };
+    }
 
     let searchResults = await search({
       query: req.body.query,
@@ -150,6 +163,7 @@ export async function searchController(
       lang: req.body.lang,
       country: req.body.country,
       location: req.body.location,
+      proxy: proxy,
     });
 
     // Filter blocked URLs early to avoid unnecessary billing
